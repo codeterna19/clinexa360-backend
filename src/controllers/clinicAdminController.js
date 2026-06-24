@@ -48,6 +48,55 @@ export const addDoctor = async (req, res) => {
   }
 };
 
+// @desc    Update a doctor's details
+// @route   PUT /api/clinic-admin/doctors/:id
+// @access  Private/ClinicAdmin
+export const updateDoctor = async (req, res) => {
+  const { name, email, phone, password, qualification, specialization, registration_number, consultation_fee, status, available_timings } = req.body;
+
+  try {
+    const doctor = await Doctor.findOne({ _id: req.params.id, ...req.tenantFilter });
+
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    if (name) doctor.name = name;
+    if (email) doctor.email = email;
+    if (phone) doctor.phone = phone;
+    if (password) doctor.password = password;
+    if (qualification) doctor.qualification = qualification;
+    if (specialization) doctor.specialization = specialization;
+    if (registration_number) doctor.registration_number = registration_number;
+    if (consultation_fee) doctor.consultation_fee = consultation_fee;
+    if (status) doctor.status = status;
+    if (available_timings) doctor.available_timings = available_timings;
+
+    const updatedDoctor = await doctor.save();
+    res.json(updatedDoctor);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete a doctor
+// @route   DELETE /api/clinic-admin/doctors/:id
+// @access  Private/ClinicAdmin
+export const deleteDoctor = async (req, res) => {
+  try {
+    const doctor = await Doctor.findOne({ _id: req.params.id, ...req.tenantFilter });
+
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    await doctor.deleteOne();
+    res.json({ message: 'Doctor deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get all staff (Receptionists, Nurses, etc) for a clinic
 // @route   GET /api/clinic-admin/staff
 // @access  Private/ClinicAdmin

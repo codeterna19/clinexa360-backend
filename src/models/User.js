@@ -15,7 +15,7 @@ const UserSchema = new Schema(
     },
     status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
     available_timings: [{
-      day: { type: String },
+      days: [{ type: String }],
       start: { type: String },
       end: { type: String }
     }]
