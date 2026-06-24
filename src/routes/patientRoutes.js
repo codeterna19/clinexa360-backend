@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPatients, registerPatient, updatePatient } from '../controllers/patientController.js';
+import { getPatients, registerPatient, updatePatient, deletePatient } from '../controllers/patientController.js';
 import { protect, authorize } from '../middlewares/authMiddleware.js';
 import { tenantMiddleware } from '../middlewares/tenantMiddleware.js';
 
@@ -15,6 +15,7 @@ router.route('/')
   .post(registerPatient);
 
 router.route('/:id')
-  .put(updatePatient);
+  .put(updatePatient)
+  .delete(deletePatient);
 
 export default router;

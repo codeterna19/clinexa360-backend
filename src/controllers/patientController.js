@@ -64,3 +64,21 @@ export const updatePatient = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Delete a patient
+// @route   DELETE /api/patients/:id
+// @access  Private (ClinicAdmin, Receptionist)
+export const deletePatient = async (req, res) => {
+  try {
+    const patient = await Patient.findOne({ _id: req.params.id, ...req.tenantFilter });
+
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    await patient.deleteOne();
+    res.json({ message: 'Patient deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
