@@ -33,7 +33,7 @@ export const getAppointments = async (req, res) => {
 // @route   POST /api/appointments
 // @access  Private (ClinicAdmin, Receptionist, Patient)
 export const createAppointment = async (req, res) => {
-  const { doctor_id, date, time, type } = req.body;
+  const { doctor_id, date, time, type, description } = req.body;
   
   // If a receptionist or admin is booking, they should pass patient_id
   // If a patient is booking, use their own _id
@@ -47,7 +47,8 @@ export const createAppointment = async (req, res) => {
       date,
       time,
       type: type || 'Consultation',
-      status: 'Pending'
+      status: 'Pending',
+      description
     });
 
     res.status(201).json(appointment);
@@ -87,7 +88,7 @@ export const updateAppointmentStatus = async (req, res) => {
 // @route   PUT /api/appointments/:id
 // @access  Private (ClinicAdmin, Doctor, Receptionist)
 export const updateAppointment = async (req, res) => {
-  const { patient_id, doctor_id, date, time, type, status } = req.body;
+  const { patient_id, doctor_id, date, time, type, status, description } = req.body;
 
   try {
     const appointment = await Appointment.findOne({ _id: req.params.id, ...req.tenantFilter });
@@ -102,6 +103,7 @@ export const updateAppointment = async (req, res) => {
     if (time) appointment.time = time;
     if (type) appointment.type = type;
     if (status) appointment.status = status;
+    if (description !== undefined) appointment.description = description;
 
     const updatedAppointment = await appointment.save();
     

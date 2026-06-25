@@ -9,7 +9,8 @@ const AppointmentSchema = new Schema(
     date: { type: Date, required: true },
     time: { type: String, required: true },
     type: { type: String, enum: ['Consultation', 'Follow-up', 'Telemedicine'], default: 'Consultation' },
-    status: { type: String, enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled', 'No Show'], default: 'Pending' }
+    status: { type: String, enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled', 'No Show'], default: 'Pending' },
+    description: { type: String }
   },
   { timestamps: true }
 );
