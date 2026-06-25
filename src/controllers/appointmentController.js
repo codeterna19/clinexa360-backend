@@ -82,3 +82,55 @@ export const updateAppointmentStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Update appointment details
+// @route   PUT /api/appointments/:id
+// @access  Private (ClinicAdmin, Doctor, Receptionist)
+export const updateAppointment = async (req, res) => {
+  const { patient_id, doctor_id, date, time, type, status } = req.body;
+
+  try {
+    const appointment = await Appointment.findOne({ _id: req.params.id, ...req.tenantFilter });
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    if (patient_id) appointment.patient_id = patient_id;
+    if (doctor_id) appointment.doctor_id = doctor_id;
+    if (date) appointment.date = date;
+    if (time) appointment.time = time;
+    if (type) appointment.type = type;
+    if (status) appointment.status = status;
+
+    const updatedAppointment = await appointment.save();
+    
+    // Populate before sending back
+    const populated = await Appointment.findById(updatedAppointment._id)
+      .populate('patient_id', 'name email phone')
+      .populate('doctor_id', 'name specialization');
+
+    res.json(populated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete an appointment
+// @route   DELETE /api/appointments/:id
+// @access  Private (ClinicAdmin, Doctor, Receptionist)
+export const deleteAppointment = async (req, res) => {
+  try {
+    const appointment = await Appointment.findOne({ _id: req.params.id, ...req.tenantFilter });
+
+    if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    await appointment.deleteOne();
+    res.json({ message: 'Appointment deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
