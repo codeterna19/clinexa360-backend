@@ -8,7 +8,7 @@ const AppointmentSchema = new Schema(
     doctor_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     date: { type: Date, required: true },
     time: { type: String, required: true },
-    type: { type: String, enum: ['Consultation', 'Follow-up', 'Telemedicine'], default: 'Consultation' },
+    type: { type: String, enum: ['Consultation', 'Follow-up', 'Telemedicine', 'Direct'], default: 'Consultation' },
     status: { type: String, enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled', 'No Show'], default: 'Pending' },
     description: { type: String }
   },
