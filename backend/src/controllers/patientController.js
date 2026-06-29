@@ -8,7 +8,19 @@ import Bill from '../models/Bill.js';
 // @access  Private (ClinicAdmin, Doctor, Receptionist)
 export const getPatients = async (req, res) => {
   try {
-    const patients = await Patient.find({ ...req.tenantFilter, role: 'Patient' });
+    // Find all appointments for this clinic
+    const clinicAppointments = await Appointment.find({ ...req.tenantFilter }).select('patient_id');
+    const appointmentPatientIds = clinicAppointments.map(a => a.patient_id);
+
+    // Find patients that either belong to this clinic directly OR have an appointment here
+    const patients = await Patient.find({
+      $or: [
+        { ...req.tenantFilter },
+        { _id: { $in: appointmentPatientIds } }
+      ],
+      role: 'Patient'
+    });
+    
     res.json(patients);
   } catch (error) {
     res.status(500).json({ message: error.message });
