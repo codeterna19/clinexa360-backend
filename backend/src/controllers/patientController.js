@@ -13,7 +13,9 @@ export const getPatients = async (req, res) => {
     const appointmentPatientIds = clinicAppointments.map(a => a.patient_id);
 
     // Find patients that either belong to this clinic directly OR have an appointment here
-    const patients = await Patient.find({
+    // We use User.find() instead of Patient.find() to also catch legacy mobile-app users 
+    // that were created without the Patient discriminator key before the fix.
+    const patients = await User.find({
       $or: [
         { ...req.tenantFilter },
         { _id: { $in: appointmentPatientIds } }
