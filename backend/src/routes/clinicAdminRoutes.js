@@ -1,5 +1,5 @@
 import express from 'express';
-import { getDoctors, addDoctor, getStaff, addStaff, updateStaff, deleteStaff, getClinicSettings, updateClinicSettings } from '../controllers/clinicAdminController.js';
+import { getDoctors, addDoctor, updateDoctor, deleteDoctor, getStaff, addStaff, updateStaff, deleteStaff, getClinicSettings, updateClinicSettings } from '../controllers/clinicAdminController.js';
 import { protect, authorize } from '../middlewares/authMiddleware.js';
 import { tenantMiddleware } from '../middlewares/tenantMiddleware.js';
 
@@ -13,6 +13,10 @@ router.use(tenantMiddleware);
 router.route('/doctors')
   .get(getDoctors)
   .post(addDoctor);
+
+router.route('/doctors/:id')
+  .put(updateDoctor)
+  .delete(deleteDoctor);
 
 router.route('/staff')
   .get(getStaff)

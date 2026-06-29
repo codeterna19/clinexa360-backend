@@ -7,7 +7,7 @@ const DoctorSchema = new Schema({
   registration_number: { type: String, required: true },
   consultation_fee: { type: Number, required: true },
   available_timings: [{
-    day: { type: String },
+    days: [{ type: String }],
     start: { type: String },
     end: { type: String }
   }]

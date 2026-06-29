@@ -13,6 +13,7 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import featureRoutes from './routes/featureRoutes.js';
 import planRoutes from './routes/planRoutes.js';
+import publicRoutes from './routes/publicRoutes.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/features', featureRoutes);
 app.use('/api/plans', planRoutes);
+app.use('/api/public', publicRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {

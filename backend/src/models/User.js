@@ -15,7 +15,7 @@ const UserSchema = new Schema(
     },
     status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' },
     available_timings: [{
-      day: { type: String },
+      days: [{ type: String }],
       start: { type: String },
       end: { type: String }
     }]
@@ -29,9 +29,9 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-UserSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    next();
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import Patient from '../models/Patient.js';
 import bcrypt from 'bcryptjs';
 
 const generateToken = (id) => {
@@ -66,6 +67,46 @@ export const registerSuperAdmin = async (req, res) => {
       });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Register a new Patient (Public Mobile App)
+// @route   POST /api/auth/register-patient
+// @access  Public
+export const registerPatientAuth = async (req, res) => {
+  const { name, email, password, phone, dob, gender } = req.body;
+
+  try {
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+      return res.status(400).json({ message: 'Email is already registered' });
+    }
+
+    const patient = await Patient.create({
+      name,
+      email,
+      password,
+      phone,
+      dob,
+      gender,
+      role: 'Patient',
+      status: 'Active'
+    });
+
+    if (patient) {
+      res.status(201).json({
+        _id: patient._id,
+        name: patient.name,
+        email: patient.email,
+        role: patient.role,
+        token: generateToken(patient._id),
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid patient data' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

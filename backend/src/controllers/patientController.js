@@ -1,4 +1,7 @@
 import Patient from '../models/Patient.js';
+import User from '../models/User.js';
+import Appointment from '../models/Appointment.js';
+import Bill from '../models/Bill.js';
 
 // @desc    Get all patients for the clinic
 // @route   GET /api/patients
@@ -60,6 +63,83 @@ export const updatePatient = async (req, res) => {
     } else {
       res.status(404).json({ message: 'Patient not found' });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete a patient
+// @route   DELETE /api/patients/:id
+// @access  Private (ClinicAdmin, Receptionist)
+export const deletePatient = async (req, res) => {
+  try {
+    const patient = await Patient.findOne({ _id: req.params.id, ...req.tenantFilter });
+
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    await patient.deleteOne();
+    res.json({ message: 'Patient deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get patient's own appointments
+// @route   GET /api/patients/my-appointments
+// @access  Private (Patient)
+export const getMyAppointments = async (req, res) => {
+  try {
+    const appointments = await Appointment.find({ patient_id: req.user._id })
+      .populate('doctor_id', 'name specialization')
+      .populate('clinic_id', 'name address')
+      .sort({ date: 1, time: 1 });
+      
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get patient's own bills
+// @route   GET /api/patients/my-bills
+// @access  Private (Patient)
+export const getMyBills = async (req, res) => {
+  try {
+    const bills = await Bill.find({ patient_id: req.user._id })
+      .populate('appointment_id', 'date time doctor_id clinic_id')
+      .sort({ createdAt: -1 });
+      
+    res.json(bills);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Book an appointment (Patient initiated)
+// @route   POST /api/patients/book-appointment
+// @access  Private (Patient)
+export const bookAppointment = async (req, res) => {
+  try {
+    const { doctor_id, clinic_id, date, time, reason } = req.body;
+    
+    // Quick validation
+    if (!doctor_id || !clinic_id || !date || !time) {
+      return res.status(400).json({ message: 'Missing required appointment fields' });
+    }
+
+    const appointment = await Appointment.create({
+      patient_id: req.user._id,
+      doctor_id,
+      clinic_id,
+      date,
+      time,
+      description: reason,
+      status: 'Pending'
+    });
+
+    res.status(201).json(appointment);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
