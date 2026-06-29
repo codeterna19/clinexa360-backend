@@ -15,7 +15,16 @@ export const authUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate({
+      path: 'clinic_id',
+      populate: [
+        {
+          path: 'subscriptionPlan',
+          populate: { path: 'features' }
+        },
+        { path: 'customFeatures' }
+      ]
+    });
 
     if (user && (await user.matchPassword(password))) {
       res.json({
